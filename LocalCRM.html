@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报告管理 - 本地版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', '微软雅黑', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #EBECF1;
+            color: #333;
+        }
+        
+        /* 登录页面样式 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #EBECF1;
+        }
+        
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 400px;
+            text-align: center;
+        }
+        
+        .login-box h2 {
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .login-form button:hover {
+            background-color: #2980b9;
+        }
+        
+        .login-error {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 第一列：管理中心 + 一级菜单 */
+        .sidebar {
+            width: 160px;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar h2 {
+            font-size: 23px;
+            padding: 8px 20px;
+            border-bottom: 1px solid #34495e;
+            margin: 0;
+            font-weight: normal;
+            text-align: center;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+        
+        .primary-menu-col {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .primary-menu-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .primary-menu-col .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .primary-menu-col .menu-item:hover {
+            background-color: #34495e;
+        }
+        
+        .primary-menu-col .menu-item.active {
+            background-color: #3498db;
+        }
+        
+        .primary-menu-col .menu-item .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 第二列 */
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 第二列上部：欢迎栏 */
+        .welcome-bar {
+            height: 40px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .welcome-bar .overview-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        /* 第二列下部：二级菜单 + 内容区 */
+        .content-area {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* 二级菜单列 */
+        .submenu-col {
+            width: 106px;
+            background-color: #DBDFEA;
+            color: #333;
+            display: none;
+            overflow-y: auto;
+        }
+        
+        .submenu-col.show {
+            display: block;
+        }
+        
+        .submenu-col h3 {
+            font-size: 15px;
+            padding: 15px 20px;
+            margin: 0;
+            border-bottom: 1px solid #c5c9d2;
+            font-weight: bold;
+            background-color: #DBDFEA;
+            text-align: center;
+        }
+        
+        .submenu-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .submenu-col .submenu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .submenu-col .submenu-item:hover {
+            background-color: #c5c9d2;
+        }
+        
+        .submenu-col .submenu-item.active {
+            background-color: #E7EAF3;
+            color: #333;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .top-nav h1 {
+            font-size: 15px;
+            padding: 2px 20px;
+            margin: 0;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            margin-left: -3em;
+        }
+        
+        .user-info .editable-name {
+            border: 1px solid transparent;
+            padding: 2px 5px;
+            border-radius: 3px;
+            cursor: text;
+            min-width: 80px;
+            display: inline-block;
+        }
+        
+        .user-info .editable-name:hover {
+            border-color: #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        .user-info .editable-name:focus {
+            border-color: #3498db;
+            background-color: white;
+            outline: none;
+        }
+        
+        .user-icon {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        
+        .logout-icon {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            margin-left: -1em;
+        }
+        
+        .logout-icon:hover {
+            opacity: 1;
+        }
+        
+        .fullscreen-btn {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            opacity: 0;
+            transition: opacity 0.3s;
+            margin-right: 10px;
+        }
+        
+        .form-actions:hover .fullscreen-btn {
+            opacity: 1;
+        }
+        
+        .fullscreen-btn:hover {
+            opacity: 1;
+        }
+        
+        /* 区域选择 */
+        .region-selector {
+            margin-bottom: 12px;
+        }
+        
+        .region-btn {
+            padding: 5px 12px;
+            margin-right: 8px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+        
+        .region-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        /* 表单区域 */
+        .form-section {
+            background-color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            flex-shrink: 0;
+            width: 100%;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, auto);
+            gap: 8px 20px;
+            margin-bottom: 8px;
+            justify-content: start;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+            width: 80px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 160px;
+            flex-shrink: 0;
+        }
+        
+        .form-group input[readonly] {
+            background-color: white;
+            cursor: default;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5px;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        
+        .btn {
+            padding: 6px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #e67e22;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d35400;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .form-actions:hover .btn-success {
+            opacity: 1;
+        }
+        
+        .btn-success:hover {
+            background-color: #219a52;
+        }
+        
+        /* 表格区域 */
+        .table-section {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+            overflow: hidden;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-section .table-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .table-section h3 {
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-expired {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .action-btn {
+            color: #3498db;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        tr:hover .action-btn {
+            opacity: 1;
+        }
+        
+        .action-btn:hover {
+            color: #2980b9;
+        }
+        
+        .action-btn.phone {
+            opacity: 1;
+            color: #3498db;
+            order: 2;
+        }
+        
+        .action-btn.phone:hover {
+            color: #2980b9;
+        }
+        
+        .action-btn.edit {
+            order: 1;
+        }
+        
+        .action-btn.delete {
+            order: 3;
+        }
+        
+        td[contenteditable="true"] {
+            cursor: text;
+            transition: background-color 0.2s;
+        }
+        
+        td[contenteditable="true"]:hover {
+            background-color: #f0f7ff;
+        }
+        
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #3498db;
+            background-color: white;
+        }
+        
+        td select {
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .today-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 2px 4px;
+            margin-right: 4px;
+        }
+        
+        .today-btn:hover {
+            opacity: 1;
+        }
+        
+        th:hover .today-btn {
+            opacity: 1;
+        }
+        
+        .edit-input {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .edit-select {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-edit-save {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-edit-save:hover {
+            background-color: #219a52;
+        }
+        
+        .btn-edit-cancel {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-edit-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-edit-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-edit-delete:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h2>欢迎回来</h2>
+            <form class="login-form" onsubmit="return login()">
+                <div class="form-group">
+                    <label for="loginUsername">用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码">
+                </div>
+                <button type="submit">登录</button>
+                <div id="loginError" class="login-error"></div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- CRM主页面 -->
+    <div id="crmPage" class="container" style="display: none;">
+        <div class="sidebar">
+            <h2>管理中心</h2>
+            <div class="primary-menu-col">
+                    <ul>
+                        <li class="menu-item" data-menu="query">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg></span>
+                            <span>综合查询</span>
+                        </li>
+                        <li class="menu-item active" data-menu="credit">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="4" width="20" height="5" rx="2"></rect><path d="M6 8v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg></span>
+                            <span>授信管理</span>
+                        </li>
+                        <li class="menu-item" data-menu="followup">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
+                            <span>回访中心</span>
+                        </li>
+                        <li class="menu-item" data-menu="customer">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M12 11h4"></path><path d="M12 15h4"></path><path d="M8 11h.01"></path><path d="M8 15h.01"></path></svg></span>
+                            <span>客户档案</span>
+                        </li>
+                        <li class="menu-item" data-menu="overdue">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>
+                            <span>逾期管理</span>
+                        </li>
+                        <li class="menu-item" data-menu="loan">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span>
+                            <span>贷款管理</span>
+                        </li>
+                        <li class="menu-item" data-menu="personal">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                            <span>个人中心</span>
+                        </li>
+                        <li class="menu-item" data-menu="system">
+                            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1 1.51z"></path></svg></span>
+                            <span>系统设置</span>
+                        </li>
+                    </ul>
+                </div>
+        </div>
+        
+        <div class="right-section">
+            <div class="welcome-bar">
+                <div class="overview-icon">
+                    <svg t="1774903800649" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27879" width="20" height="20"><path d="M801.610492 306.99186c-28.256554 0-51.16531 22.909779-51.16531 51.16531 0 8.41567 2.069125 16.33299 5.668093 23.336498L629.027855 516.056386c-6.336312-2.811022-13.33061-4.403287-20.708648-4.403287-7.540743 0-14.676257 1.674129-21.122063 4.602831l-130.021286-135.185912c3.466961-6.89913 5.465478-14.665001 5.465478-22.913872 0-28.255531-22.908756-51.16531-51.16531-51.16531-28.255531 0-51.16531 22.909779-51.16531 51.16531 0 8.583492 2.139733 16.659425 5.875824 23.763217L242.022661 515.852748c-6.222725-2.692319-13.074783-4.199649-20.284999-4.199649-28.256554 0-51.16531 22.909779-51.16531 51.16531s22.908756 51.16531 51.16531 51.16531c28.255531 0 51.16531-22.909779 51.16531-51.16531 0-8.585539-2.139733-16.661472-5.876847-23.76731l124.165928-133.928269c6.221702 2.692319 13.07376 4.199649 20.282952 4.199649 7.53972 0 14.676257-1.674129 21.12104-4.602831l130.023332 135.185912c-3.466961 6.89913-5.466502 14.665001-5.466502 22.913872 0 28.255531 22.909779 51.16531 51.16531 51.16531 28.256554 0 51.16531-22.909779 51.16531-51.16531 0-8.414647-2.069125-16.33299-5.668093-23.334451l127.087467-134.564765c6.335289 2.811022 13.329587 4.403287 20.706601 4.403287 28.255531 0 51.16531-22.909779 51.16531-51.16531S829.867046 306.99186 801.610492 306.99186z" fill="#666" p-id="27880"></path><path d="M902.390803 101.142561l-784.875854 0c-28.257577 0-51.16531 22.907733-51.16531 51.16531l0 613.983719c0 28.257577 22.907733 51.16531 51.16531 51.16531l784.875854 0c28.257577 0 51.16531-22.907733 51.16531-51.16531l0-613.983719C953.556113 124.050294 930.649404 101.142561 902.390803 101.142561zM919.787008 765.609045c0 9.419534-7.635911 17.055444-17.055444 17.055444L118.197494 782.664489c-9.419534 0-17.055444-7.635911-17.055444-17.055444L101.14205 151.96711c0-9.419534 7.635911-17.055444 17.055444-17.055444l784.535093 0c9.419534 0 17.055444 7.635911 17.055444 17.055444L919.788032 765.609045z" fill="#666" p-id="27881"></path><path d="M682.225451 884.995109 341.122703 884.995109c-9.41851 0-17.055444 7.977695-17.055444 17.396205s7.636934 17.396205 17.055444 17.396205l341.101725 0c9.41851 0 17.055444-7.977695 17.055444-17.396205S691.643961 884.995109 682.225451 884.995109z" fill="#666" p-id="27882"></path></svg>
+                    <span>概览</span>
+                </div>
+                <div class="user-info">
+                    <span><svg t="1775028942875" class="icon" viewBox="0 0 1515 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6545" width="24" height="24" style="vertical-align: middle;"><path d="M1034.42544033 882.78843953h-711.11782519a182.24411446 182.24411446 0 0 1-88.23078804-22.86120057l-24.69009711-13.67637724 334.64763808-341.45220733L630.2259608 591.71156137a79.94696432 79.94696432 0 0 0 112.88054162-1e-8L829.7370061 505.1079529l326.63276929 326.70000876-19.23030413 19.23030415-1.76165708 1.16995599a181.20863666 181.20863666 0 0 1-100.95237385 30.58021772zM282.91052805 833.77133569a138.59266819 138.59266819 0 0 0 40.34329596 6.02459882h711.11782518a138.29681801 138.29681801 0 0 0 56.8705992-12.10298879L829.7370061 565.95909055l-56.13097232 56.13097231a123.02015638 123.02015638 0 0 1-173.79891802 0l-0.16137341-0.14792509-54.54413554-55.6603004z" fill="#8a8a8a" p-id="6546"></path><path d="M1137.27394873 220.16325583l-0.13447748-0.12103059-1.73476187-1.16995528A181.16829313 181.16829313 0 0 0 1034.42544033 188.27860393h-711.11782519a182.31135321 182.31135321 0 0 0-73.33066441 15.45148263l-0.56480585-0.5648066L235.0768271 211.13980521A182.31135321 182.31135321 0 0 0 141.21142578 370.37479329V700.63845974c0 100.41446318 81.68172618 182.09618937 182.09618937 182.09618864h711.11782518c100.40101559 0 182.09618937-81.68172618 182.09618936-182.09618865V370.37479329a181.86757721 181.86757721 0 0 0-79.24768096-150.21153746zM323.30761515 231.31145319h711.11782518a138.51198183 138.51198183 0 0 1 56.87059919 12.10298806L743.10650242 591.71156137a79.96041191 79.96041191 0 0 1-112.86709404-1e-8L282.92397566 237.34949962A138.90196741 138.90196741 0 0 1 323.30761515 231.31145319z m850.181166 469.32700654a139.22471352 139.22471352 0 0 1-139.06334082 139.11713124h-711.11782518A139.22471352 139.22471352 0 0 1 184.24427433 700.63845974V370.37479329a139.19781831 139.19781831 0 0 1 58.06745039-112.96122797l357.26677889 364.52857245 0.16137341 0.14792509a123.02015638 123.02015638 0 0 0 173.79891803 0L1128.04878187 267.62041884a138.79438513 138.79438513 0 0 1 45.43999928 102.78126965z" fill="#8a8a8a" p-id="6547"></path><path d="M1090.98674102 289.29821653m-148.08679073-1e-8a148.08679074 148.08679074 0 1 0 296.17358147 0 148.08679074 148.08679074 0 1 0-296.17358147 0Z" fill="#ea9518" p-id="6548"></path></svg>&nbsp;&nbsp;&nbsp;<span class="user-icon"><svg t="1774900643240" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15723" width="16" height="16"><path d="M1024 544c0 265.12-214.944 480-480 480h-64C214.912 1024 0 809.12 0 544v-64C0 214.912 214.912 0 480 0h64c265.056 0 480 214.912 480 480v64z" fill="#085684" p-id="15724"></path><path d="M512.032 160a216.896 216.896 0 0 0-216.64 216.64 216.896 216.896 0 0 0 216.64 216.608c119.424 0 216.672-97.248 216.672-216.608A216.96 216.96 0 0 0 512.032 160z" fill="#FFFFFF" p-id="15725"></path><path d="M678.976 588.256c-46.112 36.512-103.584 59.104-166.944 59.104s-120.768-22.656-167.04-59.104c-87.584 55.776-148.544 153.696-156.928 267.104 30.656 4.16 85.248 8.64 163.104 8.64h321.568c77.92 0 132.512-4.48 163.232-8.672-8.32-113.44-69.312-211.296-156.992-267.072z" fill="#FFFFFF" p-id="15726"></path></svg></span>&nbsp;&nbsp;&nbsp;&nbsp;欢迎您，<select id="userName" class="editable-name" style="background: transparent; border: 1px solid transparent; padding: 2px 5px; border-radius: 3px; cursor: pointer; min-width: 80px; font-size: 13px; color: #333; appearance: none; -webkit-appearance: none; -moz-appearance: none;"><option value="王经理">王经理</option><option value="黄经理">黄经理</option><option value="佘经理">佘经理</option><option value="谷经理">谷经理</option><option value="朱经理">朱经理</option><option value="郑经理">郑经理</option><option value="林经理">林经理</select><span class="logout-icon" onclick="logout()" title="退出"><svg t="1774899978565" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7033" width="16" height="16"><path d="M184.552727 768l0-512c0-38.539636 31.278545-69.818182 69.818182-69.818182l302.545455 0L556.916364 139.636364l-325.818182 0c-51.432727 0-93.090909 41.658182-93.090909 93.090909l0 558.545455c0 51.432727 41.658182 93.090909 93.090909 93.090909l325.818182 0 0-46.545455-302.545455 0C215.784727 837.818182 184.552727 806.539636 184.552727 768zM924.113455 495.522909l-164.584727-164.584727c-9.076364-9.076364-23.831273-9.076364-32.907636 0-9.076364 9.076364-9.076364 23.831273 0 32.907636l124.834909 124.834909L394.007273 488.680727c-12.846545 0-23.272727 10.426182-23.272727 23.272727s10.426182 23.272727 23.272727 23.272727l457.448727 0-124.834909 124.834909c-9.076364 9.076364-9.076364 23.831273 0 32.907636 9.076364 9.076364 23.831273 9.076364 32.907636 0l164.584727-164.584727C933.189818 519.354182 933.189818 504.645818 924.113455 495.522909z" fill="#666" p-id="7034"></path></svg></span></span>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="submenu-col show" id="credit-submenu">
+                    <h3>授信管理</h3>
+                    <ul>
+                        <li class="submenu-item active">客户授信</li>
+                        <li class="submenu-item">授信用户</li>
+                        <li class="submenu-item">审批管理</li>
+                        <li class="submenu-item">客户中心</li>
+                        <li class="submenu-item">客户分类</li>
+                        <li class="submenu-item">个人办公</li>
+                        <li class="submenu-item">审批设置</li>
+                    </ul>
+                </div>
+                
+                <div class="main-content">
+            <div class="top-nav">
+                <h1>选择区域</h1>
+            </div>
+            
+            <div class="region-selector">
+                <button class="region-btn active">广东-广州</button>
+                <button class="region-btn">广东-佛山</button>
+                <button class="region-btn">广东-深圳</button>
+                <button class="region-btn">广东-中山</button>
+                <button class="region-btn">广东-珠海</button>
+                <button class="region-btn">广东-清远</button>
+                <button class="region-btn">广东-惠州</button>
+                <button class="region-btn">广东-东莞</button>
+            </div>
+            
+            <div class="form-section">
+                <div style="height: 10px;"></div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>业务类型：</label>
+                        <select id="businessType">
+                            <option value="个人消费贷">个人消费贷</option>
+                            <option value="企业贷款">企业贷款</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>产品名称：</label>
+                        <select id="productName">
+                            <option value="A类优质工薪">A类优质工薪</option>
+                            <option value="B类优质工薪">B类优质工薪</option>
+                            <option value="C类优质工薪">C类优质工薪</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>地区：</label>
+                        <select id="region">
+                            <option value="广州">广州</option>
+                            <option value="佛山">佛山</option>
+                            <option value="深圳">深圳</option>
+                            <option value="中山">中山</option>
+                            <option value="珠海">珠海</option>
+                            <option value="清远">清远</option>
+                            <option value="惠州">惠州</option>
+                            <option value="东莞">东莞</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>客户类型：</label>
+                        <select id="customerType">
+                            <option value="新开户">新开户</option>
+                            <option value="老用户">老用户</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>客户姓名：</label>
+                        <input type="text" id="customerName" placeholder="请输入客户姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>手机号码：</label>
+                        <input type="text" id="phone" placeholder="请输入手机号码">
+                    </div>
+                    <div class="form-group">
+                        <label>公积金：</label>
+                        <input type="text" id="fundAmount" placeholder="请输入公积金基数">
+                    </div>
+                    <div class="form-group">
+                        <label>单位名称：</label>
+                        <input type="text" id="company" placeholder="请输入单位名称">
+                    </div>
+                    <div class="form-group">
+                        <label>银行卡号：</label>
+                        <input type="text" id="bankAccount" placeholder="请输入银行账号">
+                    </div>
+                    <div class="form-group">
+                        <label>授信方式：</label>
+                        <input type="text" id="loanMethod" placeholder="请输入">
+                    </div>
+                    <div class="form-group">
+                        <label>授信额度：</label>
+                        <input type="text" id="expectedAmount" placeholder="请输入" oninput="autoClassifyProduct()">
+                    </div>
+                    <div class="form-group">
+                        <label>入账支行：</label>
+                        <input type="text" id="hireDate" placeholder="请输入">
+                    </div>
+                    <div class="form-group">
+                        <label>证件号码：</label>
+                        <input type="text" id="idNumber" placeholder="请输入身份证号码">
+                    </div>
+                    <div class="form-group">
+                        <label>薪资：</label>
+                        <input type="text" id="salary" placeholder="请输入">
+                    </div>
+                    <div class="form-group">
+                        <label>ID：</label>
+                        <input type="text" id="td" placeholder="请输入">
+                    </div>
+                    <div class="form-group">
+                        <label>授信类型：</label>
+                        <input type="text" id="loanType" placeholder="请输入">
+                    </div>
+                </div>
+                
+                <div style="height: 10px;"></div>
+                
+                <div class="filter-row" style="display: flex; gap: 30px; margin-bottom: 10px; white-space: nowrap;">
+                    <div class="filter-item" style="display: flex; align-items: center; gap: 5px;">
+                        <span style="font-size: 12px; color: #666;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否过滤已通知客户：</span>
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 2px;"><input type="radio" name="filterNotified" value="是" checked> 是</label>
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 2px;"><input type="radio" name="filterNotified" value="否"> 否</label>
+                    </div>
+                    <div class="filter-item" style="display: flex; align-items: center; gap: 5px;">
+                        <span style="font-size: 12px; color: #666;">是否过滤已结清客户：</span>
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 2px;"><input type="radio" name="filterSettled" value="是" checked> 是</label>
+                        <label style="font-size: 12px; display: flex; align-items: center; gap: 2px;"><input type="radio" name="filterSettled" value="否"> 否</label>
+                    </div>
+                </div>
+                
+                <div style="height: 20px;"></div>
+                
+                <div class="form-actions">
+                    <button class="btn today-btn fullscreen-btn" onclick="toggleFullscreen()" title="全屏"><svg t="1774907093157" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="36312" width="16" height="16" style="vertical-align: middle;"><path d="M192 192h-64v64h64v-64zm0 576h-64v64h64v-64zm576 0h64v-64h-64v64zm0-576h64v64h-64v-64zM480 128c-193.28 0-352 158.72-352 352s158.72 352 352 352 352-158.72 352-352-158.72-352-352-352zm0 64c160.96 0 291.2 130.24 291.2 288s-130.24 288-291.2 288-291.2-130.24-291.2-288 130.24-288 291.2-288z" fill="#666" p-id="36313"></path></svg></button>
+                    <button class="btn btn-primary" onclick="submitForm()">查询</button>
+                    <button class="btn btn-secondary" onclick="resetForm()">重填</button>
+                    <button class="today-btn" onclick="fillTodayDate()" title="魔法时间">📅</button>
+                    <button class="btn today-btn" onclick="fillAllTodayDate()" title="全部今日时间">全部今日时间</button>
+                    <button class="btn btn-success" onclick="addNewRow()">新增</button>
+                </div>
+            </div>
+            
+            <div class="table-section">
+                <h3>详情列表</h3>
+                <div class="table-container">
+                    <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>客户名称</th>
+                            <th>授信额度</th>
+                            <th>产品名称</th>
+                            <th>额度授信时间</th>
+                            <th>授信额度说明</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let editingId = null;
+        
+        // 登录函数
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            // 验证用户名和密码
+            if (username === '111' && password === '222') {
+                // 登录成功，存储登录状态
+                localStorage.setItem('isLoggedIn', 'true');
+                // 隐藏登录页面，显示CRM页面
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('crmPage').style.display = 'flex';
+                // 初始化数据
+                initData();
+                return false;
+            } else {
+                // 登录失败，显示错误信息
+                errorDiv.textContent = '用户名或密码错误';
+                return false;
+            }
+        }
+        
+        function initData() {
+            // 加载用户名
+            const savedUserName = localStorage.getItem('userName');
+            if (savedUserName) {
+                const userNameSelect = document.getElementById('userName');
+                for (let i = 0; i < userNameSelect.options.length; i++) {
+                    if (userNameSelect.options[i].value === savedUserName) {
+                        userNameSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            // 清除旧数据
+            localStorage.removeItem('crmData');
+            
+            // 强制重置数据，使用新的 code 字段
+            const today = new Date();
+            const initialData = [
+                { id: 1, customerName: '张明华', amount: '¥300,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 2, customerName: '李建国', amount: '¥1,000,000.00', product: 'A类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 3, customerName: '王志强', amount: '¥500,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 4, customerName: '刘芳', amount: '¥500,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 5, customerName: '陈秀英', amount: '¥800,000.00', product: 'A类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 6, customerName: '杨文龙', amount: '¥500,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 7, customerName: '赵静', amount: '¥280,000.00', product: 'C类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已激活' },
+                { id: 8, customerName: '黄伟东', amount: '¥360,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 9, customerName: '周淑珍', amount: '¥750,000.00', product: 'A类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已激活' },
+                { id: 10, customerName: '吴明', amount: '¥420,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已失效' },
+                { id: 11, customerName: '徐海燕', amount: '¥880,000.00', product: 'A类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已激活' },
+                { id: 12, customerName: '孙建华', amount: '¥650,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已失效' },
+                { id: 13, customerName: '马丽', amount: '¥280,000.00', product: 'C类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '待激活' },
+                { id: 14, customerName: '朱国栋', amount: '¥880,000.00', product: 'A类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已激活' },
+                { id: 15, customerName: '林小燕', amount: '¥480,000.00', product: 'B类优质工薪', manager: formatLocalDate(today), code: '额度授信有效期为15天，请及时通知客户激活使用。', status: '已失效' }
+            ];
+            localStorage.setItem('crmData', JSON.stringify(initialData));
+            renderTable();
+            
+            // 默认执行魔法时间
+            fillTodayDate(false);
+        }
+        
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                // 清除登录状态
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userName');
+                alert('已退出登录');
+                // 刷新页面返回登录页面
+                location.reload();
+            }
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+        
+        // 页面加载时检查登录状态
+        window.onload = function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                // 已登录，显示CRM页面
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('crmPage').style.display = 'flex';
+                initData();
+            } else {
+                // 未登录，显示登录页面
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('crmPage').style.display = 'none';
+            }
+        }
+        
+        function maskCustomerName(name) {
+            if (!name || name.length === 0) return name;
+            if (name.length === 2) {
+                return name[0] + '*';
+            } else if (name.length >= 3) {
+                return name[0] + '*' + name.substring(2);
+            }
+            return name;
+        }
+        
+        function renderTable() {
+            const data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const statusClass = item.status === '已激活' ? 'status-active' : 
+                                  item.status === '已失效' ? 'status-expired' : 'status-pending';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td contenteditable="true" data-field="customerName" data-id="${item.id}">${maskCustomerName(item.customerName)}</td>
+                    <td contenteditable="true" data-field="amount" data-id="${item.id}">${formatCurrency(item.amount)}</td>
+                    <td data-field="product" data-id="${item.id}" onclick="cycleProduct(${item.id})" style="cursor: pointer;">${item.product}</td>
+                    <td contenteditable="true" data-field="manager" data-id="${item.id}">${item.manager}</td>
+                    <td contenteditable="true" data-field="code" data-id="${item.id}">${item.code}</td>
+                    <td data-field="status" data-id="${item.id}" onclick="cycleStatus(${item.id})" style="cursor: pointer;"><span class="status ${statusClass}">${item.status}</span></td>
+                    <td style="display: flex; justify-content: center; align-items: center;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="action-btn phone" title="电话"><svg t="1774896039192" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4384" width="16" height="16"><path d="M718.684 455.362c0 20.499 13.639 33.48 33.48 33.48s33.48-13.639 33.48-33.48c-0.658-111.727-90.66-201.819-202.387-202.387-20.499 0-33.48 13.639-33.48 33.48 0 20.499 13.639 33.48 33.48 33.48 74.578 0.658 134.768 60.848 135.426 135.426z m134.678 0c0 20.499 13.639 33.48 33.48 33.48s33.48-13.639 33.48-33.48c0-185.647-152.07-337.155-337.155-337.155-20.499 0-33.48 13.639-33.48 33.48 0 20.499 13.639 33.48 33.48 33.48 148.59 0.091 270.195 121.787 270.195 270.195zM397.71 337.334c37.24-37.24 40.349-94.329 6.869-134.768L300.19 70.43c-33.48-44.108-98.088-50.971-141.538-16.831-3.101 3.101-6.869 3.101-6.869 6.869l-91.227 91.227c-87.559 87.559 37.24 324.084 263.235 550.17S782.642 1049.549 870.103 965.1l91.227-91.227c40.349-40.349 40.349-104.299 0-141.538l-6.869-6.869-131.478-104.389c-40.349-33.48-97.43-30.379-134.768 6.869l-57.089 57.089c-60.848-37.24-114.828-77.589-162.038-124.798s-87.559-101.19-124.798-162.038l53.42-60.848z m-47.21-91.225c9.97 13.639 9.97 33.48-3.101 44.108l-74.487 77.589c-10.531 10.531-13.071 26.71-6.869 40.349 39.781 73.262 90.002 140.313 148.407 199.286 58.965 58.965 126.024 108.626 199.286 148.407 13.639 6.211 29.811 3.759 40.349-6.869l77.589-77.589c13.639-13.639 30.379-13.639 44.108-3.101l131.667 108.058s3.101 0 3.101 3.101c13.071 12.413 13.639 32.913 1.226 45.991l-92.445 92.445c-44.108 44.108-252.698-67.71-451.983-263.235C168.63 458.473 60.572 246.116 104.68 202.008l94.329-94.329c13.639-9.97 37.24-9.97 47.21 6.869l104.299 131.568z" fill="#0256FF" p-id="4385"></path></svg></span>
+                        <span class="action-btn delete" onclick="deleteItem(${item.id})" title="删除">🗑️</span>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            tableBody.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+                cell.addEventListener('blur', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    const field = this.getAttribute('data-field');
+                    let value = this.textContent.trim();
+                    
+                    if (field === 'product') return;
+                    
+                    if (field === 'customerName' && value) {
+                        updateCellValue(id, field, value);
+                    } else if (field !== 'customerName') {
+                        updateCellValue(id, field, value);
+                    }
+                });
+                
+                if (cell.getAttribute('data-field') === 'customerName') {
+                    cell.addEventListener('focus', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const data = JSON.parse(localStorage.getItem('crmData') || '[]');
+                        const item = data.find(item => item.id === id);
+                        if (item) {
+                            this.textContent = item.customerName;
+                        }
+                    });
+                }
+            });
+        }
+        
+        function updateCellValue(id, field, value) {
+            const data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const index = data.findIndex(item => item.id === id);
+            
+            if (index !== -1) {
+                data[index][field] = value;
+                localStorage.setItem('crmData', JSON.stringify(data));
+                renderTable();
+            }
+        }
+        
+        function cycleStatus(id) {
+            const data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const index = data.findIndex(item => item.id === id);
+            
+            if (index !== -1) {
+                const currentStatus = data[index].status;
+                if (currentStatus === '待激活') {
+                    data[index].status = '已激活';
+                } else if (currentStatus === '已激活') {
+                    data[index].status = '已失效';
+                } else {
+                    data[index].status = '待激活';
+                }
+                localStorage.setItem('crmData', JSON.stringify(data));
+                renderTable();
+            }
+        }
+        
+        function cycleProduct(id) {
+            const data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const index = data.findIndex(item => item.id === id);
+            
+            if (index !== -1) {
+                const currentProduct = data[index].product;
+                if (currentProduct === 'A类优质工薪') {
+                    data[index].product = 'B类优质工薪';
+                } else if (currentProduct === 'B类优质工薪') {
+                    data[index].product = 'C类优质工薪';
+                } else {
+                    data[index].product = 'A类优质工薪';
+                }
+                localStorage.setItem('crmData', JSON.stringify(data));
+                renderTable();
+            }
+        }
+        
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function deleteItem(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                let data = JSON.parse(localStorage.getItem('crmData') || '[]');
+                data = data.filter(item => item.id !== id);
+                localStorage.setItem('crmData', JSON.stringify(data));
+                renderTable();
+            }
+        }
+        
+        // 辅助函数：获取指定工作日数之前的日期
+        function getWorkingDay(date, daysBack) {
+            const result = new Date(date);
+            let count = 0;
+            
+            while (count < daysBack) {
+                result.setDate(result.getDate() - 1);
+                const dayOfWeek = result.getDay();
+                // 排除周六(6)和周日(0)
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    count++;
+                }
+            }
+            
+            return result;
+        }
+        
+        function fillTodayDate(showAlert = true) {
+            const today = new Date();
+            let data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            
+            data.forEach((item, index) => {
+                let targetDate;
+                
+                if (index < 4) {
+                    // 前4条：今天
+                    targetDate = new Date(today);
+                } else if (index < 7) {
+                    // 5-7条：前一个工作日
+                    targetDate = getWorkingDay(today, 1);
+                } else if (index < 11) {
+                    // 7-11条：随机为前两天或前三天工作日
+                    const randomDays = Math.random() > 0.5 ? 2 : 3;
+                    targetDate = getWorkingDay(today, randomDays);
+                } else {
+                    // 11条以后：每增加1条，增加1个工作日
+                    const baseDays = 3;
+                    const additionalDays = index - 10;
+                    targetDate = getWorkingDay(today, baseDays + additionalDays);
+                }
+                
+                item.manager = formatLocalDate(targetDate);
+            });
+            
+            localStorage.setItem('crmData', JSON.stringify(data));
+            renderTable();
+            if (showAlert) {
+                alert('已更新时间！');
+            }
+        }
+        
+        function fillAllTodayDate() {
+            const today = new Date();
+            let data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            
+            data.forEach((item) => {
+                item.manager = formatLocalDate(today);
+            });
+            
+            localStorage.setItem('crmData', JSON.stringify(data));
+            renderTable();
+            alert('已全部更新为今日时间！');
+        }
+        
+        function addNewRow() {
+            let data = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const newId = data.length > 0 ? Math.max(...data.map(item => item.id)) + 1 : 1;
+            
+            const newRow = {
+                id: newId,
+                customerName: '新客户',
+                amount: '¥0.00',
+                product: 'A类优质工薪',
+                manager: formatLocalDate(new Date()),
+                code: '额度授信有效期为15天，请及时通知客户激活使用。',
+                status: '待激活'
+            };
+            
+            data.push(newRow);
+            localStorage.setItem('crmData', JSON.stringify(data));
+            renderTable();
+            alert('新增成功！');
+        }
+        
+        function formatCurrency(amount) {
+            // 移除 ¥ 符号和逗号，提取数字
+            const num = parseFloat(amount.replace(/[¥,]/g, ''));
+            if (isNaN(num)) return '¥0.00';
+            
+            // 格式化为千分位
+            return '¥' + num.toLocaleString('zh-CN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        function autoClassifyProduct() {
+            const amountInput = document.getElementById('expectedAmount');
+            const productSelect = document.getElementById('productName');
+            let inputValue = amountInput.value.trim();
+            
+            if (!inputValue) return;
+            
+            let amountInWan;
+            
+            if (inputValue.includes('万')) {
+                amountInWan = parseFloat(inputValue.replace(/万/g, ''));
+            } else {
+                const amount = parseFloat(inputValue);
+                if (!isNaN(amount)) {
+                    if (amount >= 10000) {
+                        amountInWan = amount / 10000;
+                    } else {
+                        amountInWan = amount;
+                    }
+                }
+            }
+            
+            if (!isNaN(amountInWan)) {
+                if (amountInWan < 30) {
+                    productSelect.value = 'C类优质工薪';
+                } else if (amountInWan > 80) {
+                    productSelect.value = 'A类优质工薪';
+                } else {
+                    productSelect.value = 'B类优质工薪';
+                }
+            }
+        }
+        
+        function submitForm() {
+            const formData = {
+                customerName: document.getElementById('customerName').value || '未填写',
+                amount: document.getElementById('expectedAmount').value ? `¥${document.getElementById('expectedAmount').value}` : '¥0.00',
+                product: document.getElementById('productName').value,
+                manager: formatLocalDate(new Date()),
+                code: '额度授信有效期为15天，请及时通知客户激活使用。',
+                status: '待激活'
+            };
+            
+            const existingData = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const newId = existingData.length > 0 ? Math.max(...existingData.map(item => item.id)) + 1 : 1;
+            formData.id = newId;
+            
+            existingData.push(formData);
+            localStorage.setItem('crmData', JSON.stringify(existingData));
+            
+            alert('提交成功！');
+            resetForm();
+            renderTable();
+        }
+        
+        function resetForm() {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => input.value = '');
+            
+            const radios = document.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => radio.checked = false);
+        }
+        
+        document.querySelectorAll('.region-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 自动更新地区表单
+                const regionText = this.textContent;
+                const cityName = regionText.split('-')[1]; // 从"广东-佛山"中提取"佛山"
+                const regionSelect = document.getElementById('region');
+                for (let i = 0; i < regionSelect.options.length; i++) {
+                    if (regionSelect.options[i].value === cityName) {
+                        regionSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            });
+        });
+        
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                const submenu = document.getElementById('credit-submenu');
+                if (this.dataset.menu === 'credit') {
+                    submenu.classList.add('show');
+                } else {
+                    submenu.classList.remove('show');
+                }
+            });
+        });
+        
+        document.querySelectorAll('.submenu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // 用户名选择保存
+        document.getElementById('userName').addEventListener('change', function() {
+            localStorage.setItem('userName', this.value);
+        });
+        
+        window.onload = initData;
+    </script>
+</body>
+</html>
