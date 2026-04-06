@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>champion</title>
+    <title>报告管理 - 本地版</title>
     <style>
         * {
             margin: 0;
@@ -65,7 +65,7 @@
         }
         
         .login-form button {
-            width: 100%;
+            width: 66.67%;
             padding: 12px;
             background-color: #3498db;
             color: white;
@@ -74,6 +74,7 @@
             font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
+            margin-left: 16.67%;
         }
         
         .login-form button:hover {
@@ -84,6 +85,94 @@
             color: #e74c3c;
             margin-top: 15px;
             font-size: 14px;
+        }
+        
+        .input-with-icon {
+            position: relative;
+            width: 100%;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .input-with-icon {
+            position: relative;
+            width: 66.67%;
+            margin: 0 auto;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 1;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 10px 10px 10px 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .login-button-container {
+            position: relative;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .login-form button {
+            width: 66.67%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .login-links {
+            width: 66.67%;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0;
+        }
+        
+        .register-link {
+            color: #333;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        
+        .forgot-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        
+        .register-link:hover,
+        .forgot-link:hover {
+            text-decoration: underline;
         }
         
         .container {
@@ -505,9 +594,11 @@
         }
         
         th {
-            background-color: #f8f9fa;
-            font-weight: 60;
-            color: #555;
+            font-family: "Microsoft YaHei", 微软雅黑, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333333;
+            background-color: #F5F5F5;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -676,26 +767,36 @@
 </head>
 <body>
     <!-- 登录页面 -->
-    <div id="loginPage" class="login-container" style="display: none;">
+    <div id="loginPage" class="login-container" style="display: flex;">
         <div class="login-box">
             <h2>欢迎回来</h2>
             <form class="login-form" onsubmit="return login()">
                 <div class="form-group">
-                    <label for="loginUsername">账号</label>
-                    <input type="text" id="loginUsername" placeholder="请输入账号">
+                    <div class="input-with-icon">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <input type="text" id="loginUsername" placeholder="请输入账户">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">密码</label>
-                    <input type="password" id="loginPassword" placeholder="请输入密码">
+                    <div class="input-with-icon">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <input type="password" id="loginPassword" placeholder="请输入密码">
+                    </div>
                 </div>
-                <button type="submit">登录</button>
+                <div class="login-button-container">
+                    <button type="submit">登录</button>
+                    <div class="login-links">
+                        <a href="javascript:void(0)" onclick="showContactInfo()" class="register-link">注册账号</a>
+                        <a href="javascript:void(0)" onclick="showContactInfo()" class="forgot-link">忘记密码</a>
+                    </div>
+                </div>
                 <div id="loginError" class="login-error"></div>
             </form>
         </div>
     </div>
     
     <!-- CRM主页面 -->
-    <div id="crmPage" class="container" style="display: flex;">
+    <div id="crmPage" class="container" style="display: none;">
         <div class="sidebar">
             <h2>管理中心</h2>
             <div class="primary-menu-col">
@@ -743,7 +844,7 @@
                     <span>概览</span>
                 </div>
                 <div class="user-info">
-                    <span><svg t="1775028942875" class="icon" viewBox="0 0 1515 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6545" width="24" height="24" style="vertical-align: middle;"><path d="M1034.42544033 882.78843953h-711.11782519a182.24411446 182.24411446 0 0 1-88.23078804-22.86120057l-24.69009711-13.67637724 334.64763808-341.45220733L630.2259608 591.71156137a79.94696432 79.94696432 0 0 0 112.88054162-1e-8L829.7370061 505.1079529l326.63276929 326.70000876-19.23030413 19.23030415-1.76165708 1.16995599a181.20863666 181.20863666 0 0 1-100.95237385 30.58021772zM282.91052805 833.77133569a138.59266819 138.59266819 0 0 0 40.34329596 6.02459882h711.11782518a138.29681801 138.29681801 0 0 0 56.8705992-12.10298879L829.7370061 565.95909055l-56.13097232 56.13097231a123.02015638 123.02015638 0 0 1-173.79891802 0l-0.16137341-0.14792509-54.54413554-55.6603004z" fill="#8a8a8a" p-id="6546"></path><path d="M1137.27394873 220.16325583l-0.13447748-0.12103059-1.73476187-1.16995528A181.16829313 181.16829313 0 0 0 1034.42544033 188.27860393h-711.11782519a182.31135321 182.31135321 0 0 0-73.33066441 15.45148263l-0.56480585-0.5648066L235.0768271 211.13980521A182.31135321 182.31135321 0 0 0 141.21142578 370.37479329V700.63845974c0 100.41446318 81.68172618 182.09618937 182.09618937 182.09618864h711.11782518c100.40101559 0 182.09618937-81.68172618 182.09618936-182.09618865V370.37479329a181.86757721 181.86757721 0 0 0-79.24768096-150.21153746zM323.30761515 231.31145319h711.11782518a138.51198183 138.51198183 0 0 1 56.87059919 12.10298806L743.10650242 591.71156137a79.96041191 79.96041191 0 0 1-112.86709404-1e-8L282.92397566 237.34949962A138.90196741 138.90196741 0 0 1 323.30761515 231.31145319z m850.181166 469.32700654a139.22471352 139.22471352 0 0 1-139.06334082 139.11713124h-711.11782518A139.22471352 139.22471352 0 0 1 184.24427433 700.63845974V370.37479329a139.19781831 139.19781831 0 0 1 58.06745039-112.96122797l357.26677889 364.52857245 0.16137341 0.14792509a123.02015638 123.02015638 0 0 0 173.79891803 0L1128.04878187 267.62041884a138.79438513 138.79438513 0 0 1 45.43999928 102.78126965z" fill="#8a8a8a" p-id="6547"></path><path d="M1090.98674102 289.29821653m-148.08679073-1e-8a148.08679074 148.08679074 0 1 0 296.17358147 0 148.08679074 148.08679074 0 1 0-296.17358147 0Z" fill="#ea9518" p-id="6548"></path></svg>&nbsp;&nbsp;&nbsp;<span class="user-icon"><svg t="1774900643240" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15723" width="16" height="16"><path d="M1024 544c0 265.12-214.944 480-480 480h-64C214.912 1024 0 809.12 0 544v-64C0 214.912 214.912 0 480 0h64c265.056 0 480 214.912 480 480v64z" fill="#085684" p-id="15724"></path><path d="M512.032 160a216.896 216.896 0 0 0-216.64 216.64 216.896 216.896 0 0 0 216.64 216.608c119.424 0 216.672-97.248 216.672-216.608A216.96 216.96 0 0 0 512.032 160z" fill="#FFFFFF" p-id="15725"></path><path d="M678.976 588.256c-46.112 36.512-103.584 59.104-166.944 59.104s-120.768-22.656-167.04-59.104c-87.584 55.776-148.544 153.696-156.928 267.104 30.656 4.16 85.248 8.64 163.104 8.64h321.568c77.92 0 132.512-4.48 163.232-8.672-8.32-113.44-69.312-211.296-156.992-267.072z" fill="#FFFFFF" p-id="15726"></path></svg></span>&nbsp;&nbsp;&nbsp;&nbsp;欢迎您，<select id="userName" class="editable-name" style="background: transparent; border: 1px solid transparent; padding: 2px 5px; border-radius: 3px; cursor: pointer; min-width: 80px; font-size: 13px; color: #333; appearance: none; -webkit-appearance: none; -moz-appearance: none;"><option value="王经理">王经理</option><option value="黄经理">黄经理</option><option value="佘经理">佘经理</option><option value="谷经理">谷经理</option><option value="朱经理">朱经理</option><option value="郑经理">郑经理</option><option value="林经理">林经理</option></select><span class="logout-icon" onclick="logout()" title="退出"><svg t="1774899978565" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7033" width="16" height="16"><path d="M184.552727 768l0-512c0-38.539636 31.278545-69.818182 69.818182-69.818182l302.545455 0L556.916364 139.636364l-325.818182 0c-51.432727 0-93.090909 41.658182-93.090909 93.090909l0 558.545455c0 51.432727 41.658182 93.090909 93.090909 93.090909l325.818182 0 0-46.545455-302.545455 0C215.784727 837.818182 184.552727 806.539636 184.552727 768zM924.113455 495.522909l-164.584727-164.584727c-9.076364-9.076364-23.831273-9.076364-32.907636 0-9.076364 9.076364-9.076364 23.831273 0 32.907636l124.834909 124.834909L394.007273 488.680727c-12.846545 0-23.272727 10.426182-23.272727 23.272727s10.426182 23.272727 23.272727 23.272727l457.448727 0-124.834909 124.834909c-9.076364 9.076364-9.076364 23.831273 0 32.907636 9.076364 9.076364 23.831273 9.076364 32.907636 0l164.584727-164.584727C933.189818 519.354182 933.189818 504.645818 924.113455 495.522909z" fill="#666" p-id="7034"></path></svg></span></span>
+                    <span><svg t="1775028942875" class="icon" viewBox="0 0 1515 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6545" width="24" height="24" style="vertical-align: middle;"><path d="M1034.42544033 882.78843953h-711.11782519a182.24411446 182.24411446 0 0 1-88.23078804-22.86120057l-24.69009711-13.67637724 334.64763808-341.45220733L630.2259608 591.71156137a79.94696432 79.94696432 0 0 0 112.88054162-1e-8L829.7370061 505.1079529l326.63276929 326.70000876-19.23030413 19.23030415-1.76165708 1.16995599a181.20863666 181.20863666 0 0 1-100.95237385 30.58021772zM282.91052805 833.77133569a138.59266819 138.59266819 0 0 0 40.34329596 6.02459882h711.11782518a138.29681801 138.29681801 0 0 0 56.8705992-12.10298879L829.7370061 565.95909055l-56.13097232 56.13097231a123.02015638 123.02015638 0 0 1-173.79891802 0l-0.16137341-0.14792509-54.54413554-55.6603004z" fill="#8a8a8a" p-id="6546"></path><path d="M1137.27394873 220.16325583l-0.13447748-0.12103059-1.73476187-1.16995528A181.16829313 181.16829313 0 0 0 1034.42544033 188.27860393h-711.11782519a182.31135321 182.31135321 0 0 0-73.33066441 15.45148263l-0.56480585-0.5648066L235.0768271 211.13980521A182.31135321 182.31135321 0 0 0 141.21142578 370.37479329V700.63845974c0 100.41446318 81.68172618 182.09618937 182.09618937 182.09618864h711.11782518c100.40101559 0 182.09618937-81.68172618 182.09618936-182.09618865V370.37479329a181.86757721 181.86757721 0 0 0-79.24768096-150.21153746zM323.30761515 231.31145319h711.11782518a138.51198183 138.51198183 0 0 1 56.87059919 12.10298806L743.10650242 591.71156137a79.96041191 79.96041191 0 0 1-112.86709404-1e-8L282.92397566 237.34949962A138.90196741 138.90196741 0 0 1 323.30761515 231.31145319z m850.181166 469.32700654a139.22471352 139.22471352 0 0 1-139.06334082 139.11713124h-711.11782518A139.22471352 139.22471352 0 0 1 184.24427433 700.63845974V370.37479329a139.19781831 139.19781831 0 0 1 58.06745039-112.96122797l357.26677889 364.52857245 0.16137341 0.14792509a123.02015638 123.02015638 0 0 0 173.79891803 0L1128.04878187 267.62041884a138.79438513 138.79438513 0 0 1 45.43999928 102.78126965z" fill="#8a8a8a" p-id="6547"></path><path d="M1090.98674102 289.29821653m-148.08679073-1e-8a148.08679074 148.08679074 0 1 0 296.17358147 0 148.08679074 148.08679074 0 1 0-296.17358147 0Z" fill="#ea9518" p-id="6548"></path></svg>&nbsp;&nbsp;&nbsp;<span class="user-icon"><svg t="1774900643240" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15723" width="16" height="16"><path d="M1024 544c0 265.12-214.944 480-480 480h-64C214.912 1024 0 809.12 0 544v-64C0 214.912 214.912 0 480 0h64c265.056 0 480 214.912 480 480v64z" fill="#085684" p-id="15724"></path><path d="M512.032 160a216.896 216.896 0 0 0-216.64 216.64 216.896 216.896 0 0 0 216.64 216.608c119.424 0 216.672-97.248 216.672-216.608A216.96 216.96 0 0 0 512.032 160z" fill="#FFFFFF" p-id="15725"></path><path d="M678.976 588.256c-46.112 36.512-103.584 59.104-166.944 59.104s-120.768-22.656-167.04-59.104c-87.584 55.776-148.544 153.696-156.928 267.104 30.656 4.16 85.248 8.64 163.104 8.64h321.568c77.92 0 132.512-4.48 163.232-8.672-8.32-113.44-69.312-211.296-156.992-267.072z" fill="#FFFFFF" p-id="15726"></path></svg></span>&nbsp;&nbsp;&nbsp;&nbsp;欢迎您，<select id="userName" class="editable-name" style="background: transparent; border: 1px solid transparent; padding: 2px 5px; border-radius: 3px; cursor: pointer; min-width: 80px; font-size: 13px; color: #333; appearance: none; -webkit-appearance: none; -moz-appearance: none;"><option value="王经理">王经理</option><option value="张经理">张经理</option><option value="赖经理">赖经理</option><option value="柯经理">柯经理</option><option value="黄经理">黄经理</option><option value="佘经理">佘经理</option><option value="谷经理">谷经理</option><option value="朱经理">朱经理</option><option value="郑经理">郑经理</option><option value="林经理">林经理</option></select><span class="logout-icon" onclick="logout()" title="退出"><svg t="1774899978565" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7033" width="16" height="16"><path d="M184.552727 768l0-512c0-38.539636 31.278545-69.818182 69.818182-69.818182l302.545455 0L556.916364 139.636364l-325.818182 0c-51.432727 0-93.090909 41.658182-93.090909 93.090909l0 558.545455c0 51.432727 41.658182 93.090909 93.090909 93.090909l325.818182 0 0-46.545455-302.545455 0C215.784727 837.818182 184.552727 806.539636 184.552727 768zM924.113455 495.522909l-164.584727-164.584727c-9.076364-9.076364-23.831273-9.076364-32.907636 0-9.076364 9.076364-9.076364 23.831273 0 32.907636l124.834909 124.834909L394.007273 488.680727c-12.846545 0-23.272727 10.426182-23.272727 23.272727s10.426182 23.272727 23.272727 23.272727l457.448727 0-124.834909 124.834909c-9.076364 9.076364-9.076364 23.831273 0 32.907636 9.076364 9.076364 23.831273 9.076364 32.907636 0l164.584727-164.584727C933.189818 519.354182 933.189818 504.645818 924.113455 495.522909z" fill="#666" p-id="7034"></path></svg></span></span>
                 </div>
             </div>
             
@@ -925,9 +1026,20 @@
             const errorDiv = document.getElementById('loginError');
             
             // 验证用户名和密码
-            if (username === '111' && password === '222') {
-                // 登录成功，存储登录状态
+            let managerName = '';
+            if ((username === 'l' && password === '888') || 
+                (username === 'z' && password === '888') || 
+                (username === 'w' && password === '888') || 
+                (username === 'k' && password === '888')) {
+                // 根据用户名设置经理名称
+                if (username === 'l') managerName = '赖经理';
+                else if (username === 'z') managerName = '张经理';
+                else if (username === 'w') managerName = '王经理';
+                else if (username === 'k') managerName = '柯经理';
+                
+                // 登录成功，存储登录状态和经理名称
                 localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('managerName', managerName);
                 // 隐藏登录页面，显示CRM页面
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('crmPage').style.display = 'flex';
@@ -941,18 +1053,13 @@
             }
         }
         
+        function showContactInfo() {
+            alert('联系v：echo_jiaya');
+        }
+        
         function initData() {
-            // 加载用户名
-            const savedUserName = localStorage.getItem('userName');
-            if (savedUserName) {
-                const userNameSelect = document.getElementById('userName');
-                for (let i = 0; i < userNameSelect.options.length; i++) {
-                    if (userNameSelect.options[i].value === savedUserName) {
-                        userNameSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
+            // 加载经理名称
+            const managerName = localStorage.getItem('managerName') || '管理员';
             
             // 清除旧数据
             localStorage.removeItem('crmData');
@@ -979,15 +1086,48 @@
             localStorage.setItem('crmData', JSON.stringify(initialData));
             renderTable();
             
+            // 更新用户信息显示
+            updateUserInfo(managerName);
+            
             // 默认执行魔法时间
             fillTodayDate(false);
+        }
+        
+        function updateUserInfo(managerName) {
+            // 查找用户信息元素并更新
+            const userInfoElements = document.querySelectorAll('.user-info');
+            userInfoElements.forEach(element => {
+                // 检查是否有可编辑的名称元素
+                const editableName = element.querySelector('.editable-name');
+                if (editableName) {
+                    if (editableName.tagName === 'SELECT') {
+                        // 如果是select标签，设置选中项
+                        for (let i = 0; i < editableName.options.length; i++) {
+                            if (editableName.options[i].value === managerName) {
+                                editableName.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    } else {
+                        // 如果是其他元素，直接设置文本
+                        editableName.textContent = managerName;
+                    }
+                } else {
+                    // 如果没有，创建一个
+                    const nameElement = document.createElement('span');
+                    nameElement.className = 'editable-name';
+                    nameElement.textContent = managerName;
+                    nameElement.contentEditable = true;
+                    element.appendChild(nameElement);
+                }
+            });
         }
         
         function logout() {
             if (confirm('确定要退出登录吗？')) {
                 // 清除登录状态
                 localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('userName');
+                localStorage.removeItem('managerName');
                 alert('已退出登录');
                 // 刷新页面返回登录页面
                 location.reload();
